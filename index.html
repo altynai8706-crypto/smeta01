@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Смета за 5 минут</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="script.js" defer></script>
+  </head>
+  <body>
+    <main class="page">
+      <header class="page-header">
+        <h1>Смета за 5 минут</h1>
+        <p>Добавьте позиции — суммы и итог посчитаются автоматически.</p>
+      </header>
+
+      <section class="card" aria-labelledby="details-heading">
+        <h2 id="details-heading">Реквизиты</h2>
+        <div class="details-grid">
+          <label class="field">
+            <span>От кого</span>
+            <input type="text" name="from" autocomplete="organization" placeholder="Ваша компания или имя">
+          </label>
+          <label class="field">
+            <span>Для кого</span>
+            <input type="text" name="to" placeholder="Клиент или организация">
+          </label>
+          <label class="field">
+            <span>Номер сметы</span>
+            <input type="text" name="estimate-number" placeholder="Например, 001">
+          </label>
+          <label class="field">
+            <span>Дата</span>
+            <input id="estimate-date" type="date" name="date">
+          </label>
+        </div>
+      </section>
+
+      <section class="card positions-card" aria-labelledby="positions-heading">
+        <div class="section-heading">
+          <h2 id="positions-heading">Позиции</h2>
+          <button id="add-position" class="add-button" type="button">+ Добавить позицию</button>
+        </div>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">Наименование</th>
+                <th scope="col">Количество</th>
+                <th scope="col">Единица</th>
+                <th scope="col">Цена</th>
+                <th scope="col">Сумма</th>
+                <th scope="col"><span class="visually-hidden">Удалить</span></th>
+              </tr>
+            </thead>
+            <tbody id="positions"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="total-card" aria-label="Итог сметы">
+        <span>Итого к оплате</span>
+        <output id="grand-total" aria-live="polite">0 ₸</output>
+      </section>
+    </main>
+  </body>
+</html>
