@@ -56,11 +56,33 @@
             <tbody id="positions"></tbody>
           </table>
         </div>
+        <div class="adjustments">
+          <label class="field">
+            <span>Скидка, %</span>
+            <input id="discount-percent" type="text" inputmode="decimal" value="0">
+          </label>
+          <label class="field">
+            <span>НДС, %</span>
+            <input id="vat-percent" type="text" inputmode="decimal" value="0">
+          </label>
+          <label class="field">
+            <span>Валюта</span>
+            <select id="currency">
+              <option value="₸">₸</option>
+              <option value="₽">₽</option>
+              <option value="$">$</option>
+              <option value="€">€</option>
+            </select>
+          </label>
+        </div>
       </section>
 
       <section class="total-card" aria-label="Итог сметы">
-        <span>Итого к оплате</span>
-        <output id="grand-total" aria-live="polite">0 ₸</output>
+        <div class="total-row"><span>Сумма</span><output id="subtotal">0 ₸</output></div>
+        <div id="discount-row" class="total-row" hidden><span>Скидка</span><output id="discount-amount">0 ₸</output></div>
+        <div id="discounted-row" class="total-row" hidden><span>Сумма со скидкой</span><output id="discounted-total">0 ₸</output></div>
+        <div id="vat-row" class="total-row" hidden><span>НДС</span><output id="vat-amount">0 ₸</output></div>
+        <div class="total-row grand-total-row"><span>Итого к оплате</span><output id="grand-total" aria-live="polite">0 ₸</output></div>
       </section>
     </main>
   </body>
