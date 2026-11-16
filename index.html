@@ -13,6 +13,9 @@
         <h1>Смета за 5 минут</h1>
         <p>Добавьте позиции — суммы и итог посчитаются автоматически.</p>
       </header>
+      <header class="print-header" aria-hidden="true">
+        <h1>Смета № <span id="print-number">—</span> от <span id="print-date">—</span></h1>
+      </header>
 
       <section class="card" aria-labelledby="details-heading">
         <h2 id="details-heading">Реквизиты</h2>
@@ -20,18 +23,22 @@
           <label class="field">
             <span>От кого</span>
             <input type="text" name="from" autocomplete="organization" placeholder="Ваша компания или имя">
+            <span id="print-from" class="print-value"></span>
           </label>
           <label class="field">
             <span>Для кого</span>
             <input type="text" name="to" placeholder="Клиент или организация">
+            <span id="print-to" class="print-value"></span>
           </label>
           <label class="field">
             <span>Номер сметы</span>
             <input type="text" name="estimate-number" placeholder="Например, 001">
+            <span id="print-detail-number" class="print-value"></span>
           </label>
           <label class="field">
             <span>Дата</span>
             <input id="estimate-date" type="date" name="date">
+            <span id="print-detail-date" class="print-value"></span>
           </label>
         </div>
       </section>
@@ -84,6 +91,26 @@
         <div id="vat-row" class="total-row" hidden><span>НДС</span><output id="vat-amount">0 ₸</output></div>
         <div class="total-row grand-total-row"><span>Итого к оплате</span><output id="grand-total" aria-live="polite">0 ₸</output></div>
       </section>
+
+      <section class="card comment-card" aria-labelledby="comment-heading">
+        <label class="field" for="comment">
+          <span id="comment-heading">Комментарий</span>
+          <textarea id="comment" placeholder="Сроки, условия оплаты и другие примечания"></textarea>
+          <span id="print-comment" class="print-value"></span>
+        </label>
+      </section>
+
+      <p class="print-signature" aria-hidden="true">Подпись ____________________</p>
+      <div class="actions">
+        <button id="new-estimate" class="secondary-button" type="button">Новая смета</button>
+        <button id="copy-whatsapp" class="secondary-button" type="button">Скопировать для WhatsApp</button>
+        <button id="save-pdf" class="add-button" type="button">Сохранить PDF</button>
+      </div>
+      <p id="copy-status" class="copy-status" role="status" aria-live="polite"></p>
+      <div id="manual-copy" class="manual-copy" hidden>
+        <label class="field" for="manual-copy-text"><span>Текст для копирования вручную</span></label>
+        <textarea id="manual-copy-text" readonly></textarea>
+      </div>
     </main>
   </body>
 </html>
