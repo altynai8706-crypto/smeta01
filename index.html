@@ -10,33 +10,47 @@
   <body>
     <main class="page">
       <header class="page-header">
-        <h1>Смета за 5 минут</h1>
-        <p>Добавьте позиции — суммы и итог посчитаются автоматически.</p>
+        <div class="brand-bar">
+          <div class="brand-identity">
+            <img class="brand-logo" src="brand-logo.png" alt="ALTAY SANTEH OPT by KADA RICH">
+            <div class="brand-name"><strong>ALTAY SANTEH OPT</strong><span>by KADA RICH</span></div>
+          </div>
+          <div class="header-controls">
+            <div class="language-switch" role="group" aria-label="Язык интерфейса" data-i18n-aria="languageLabel">
+              <button class="language-button" type="button" data-language="ru" aria-pressed="true">РУС</button>
+              <button class="language-button" type="button" data-language="kk" aria-pressed="false">ҚАЗ</button>
+            </div>
+            <button id="theme-toggle" class="theme-toggle" type="button" aria-pressed="false">Тёмная тема</button>
+          </div>
+        </div>
+        <h1 data-i18n="appTitle">Смета за 5 минут</h1>
+        <p data-i18n="hint">Добавьте позиции — суммы и итог посчитаются автоматически.</p>
       </header>
       <header class="print-header" aria-hidden="true">
-        <h1>Смета № <span id="print-number">—</span> от <span id="print-date">—</span></h1>
+        <div class="print-brand"><img src="brand-logo.png" alt=""><span>ALTAY SANTEH OPT<br>by KADA RICH</span></div>
+        <h1 id="print-heading">Смета № — от —</h1>
       </header>
 
       <section class="card" aria-labelledby="details-heading">
-        <h2 id="details-heading">Реквизиты</h2>
+        <h2 id="details-heading" data-i18n="details">Реквизиты</h2>
         <div class="details-grid">
           <label class="field">
-            <span>От кого</span>
-            <input type="text" name="from" autocomplete="organization" placeholder="Ваша компания или имя">
+            <span data-i18n="from">От кого</span>
+            <input type="text" name="from" autocomplete="organization" placeholder="Ваша компания или имя" data-i18n-placeholder="fromPlaceholder">
             <span id="print-from" class="print-value"></span>
           </label>
           <label class="field">
-            <span>Для кого</span>
-            <input type="text" name="to" placeholder="Клиент или организация">
+            <span data-i18n="to">Для кого</span>
+            <input type="text" name="to" placeholder="Клиент или организация" data-i18n-placeholder="toPlaceholder">
             <span id="print-to" class="print-value"></span>
           </label>
           <label class="field">
-            <span>Номер сметы</span>
-            <input type="text" name="estimate-number" placeholder="Например, 001">
+            <span data-i18n="estimateNumber">Номер сметы</span>
+            <input type="text" name="estimate-number" placeholder="Например, 001" data-i18n-placeholder="numberPlaceholder">
             <span id="print-detail-number" class="print-value"></span>
           </label>
           <label class="field">
-            <span>Дата</span>
+            <span data-i18n="date">Дата</span>
             <input id="estimate-date" type="date" name="date">
             <span id="print-detail-date" class="print-value"></span>
           </label>
@@ -45,19 +59,19 @@
 
       <section class="card positions-card" aria-labelledby="positions-heading">
         <div class="section-heading">
-          <h2 id="positions-heading">Позиции</h2>
-          <button id="add-position" class="add-button" type="button">+ Добавить позицию</button>
+          <h2 id="positions-heading" data-i18n="positions">Позиции</h2>
+          <button id="add-position" class="add-button" type="button" data-i18n="addPosition">+ Добавить позицию</button>
         </div>
         <div class="table-scroll">
           <table>
             <thead>
               <tr>
-                <th scope="col">Наименование</th>
-                <th scope="col">Количество</th>
-                <th scope="col">Единица</th>
-                <th scope="col">Цена</th>
-                <th scope="col">Сумма</th>
-                <th scope="col"><span class="visually-hidden">Удалить</span></th>
+                <th scope="col" data-i18n="name">Наименование</th>
+                <th scope="col" data-i18n="quantity">Количество</th>
+                <th scope="col" data-i18n="unit">Единица</th>
+                <th scope="col" data-i18n="price">Цена</th>
+                <th scope="col" data-i18n="sum">Сумма</th>
+                <th scope="col"><span class="visually-hidden" data-i18n="remove">Удалить</span></th>
               </tr>
             </thead>
             <tbody id="positions"></tbody>
@@ -65,15 +79,15 @@
         </div>
         <div class="adjustments">
           <label class="field">
-            <span>Скидка, %</span>
+            <span data-i18n="discountPercent">Скидка, %</span>
             <input id="discount-percent" type="text" inputmode="decimal" value="0">
           </label>
           <label class="field">
-            <span>НДС, %</span>
+            <span data-i18n="vatPercent">НДС, %</span>
             <input id="vat-percent" type="text" inputmode="decimal" value="0">
           </label>
           <label class="field">
-            <span>Валюта</span>
+            <span data-i18n="currency">Валюта</span>
             <select id="currency">
               <option value="₸">₸</option>
               <option value="₽">₽</option>
@@ -84,31 +98,31 @@
         </div>
       </section>
 
-      <section class="total-card" aria-label="Итог сметы">
-        <div class="total-row"><span>Сумма</span><output id="subtotal">0 ₸</output></div>
-        <div id="discount-row" class="total-row" hidden><span>Скидка</span><output id="discount-amount">0 ₸</output></div>
-        <div id="discounted-row" class="total-row" hidden><span>Сумма со скидкой</span><output id="discounted-total">0 ₸</output></div>
-        <div id="vat-row" class="total-row" hidden><span>НДС</span><output id="vat-amount">0 ₸</output></div>
-        <div class="total-row grand-total-row"><span>Итого к оплате</span><output id="grand-total" aria-live="polite">0 ₸</output></div>
+      <section class="total-card" aria-label="Итог сметы" data-i18n-aria="totalLabel">
+        <div class="total-row"><span data-i18n="sum">Сумма</span><output id="subtotal">0 ₸</output></div>
+        <div id="discount-row" class="total-row" hidden><span data-i18n="discount">Скидка</span><output id="discount-amount">0 ₸</output></div>
+        <div id="discounted-row" class="total-row" hidden><span data-i18n="discountedSum">Сумма со скидкой</span><output id="discounted-total">0 ₸</output></div>
+        <div id="vat-row" class="total-row" hidden><span data-i18n="vat">НДС</span><output id="vat-amount">0 ₸</output></div>
+        <div class="total-row grand-total-row"><span data-i18n="grandTotal">Итого к оплате</span><output id="grand-total" aria-live="polite">0 ₸</output></div>
       </section>
 
       <section class="card comment-card" aria-labelledby="comment-heading">
         <label class="field" for="comment">
-          <span id="comment-heading">Комментарий</span>
-          <textarea id="comment" placeholder="Сроки, условия оплаты и другие примечания"></textarea>
+          <span id="comment-heading" data-i18n="comment">Комментарий</span>
+          <textarea id="comment" placeholder="Сроки, условия оплаты и другие примечания" data-i18n-placeholder="commentPlaceholder"></textarea>
           <span id="print-comment" class="print-value"></span>
         </label>
       </section>
 
-      <p class="print-signature" aria-hidden="true">Подпись ____________________</p>
+      <p class="print-signature" aria-hidden="true" data-i18n="signature">Подпись ____________________</p>
       <div class="actions">
-        <button id="new-estimate" class="secondary-button" type="button">Новая смета</button>
-        <button id="copy-whatsapp" class="secondary-button" type="button">Скопировать для WhatsApp</button>
-        <button id="save-pdf" class="add-button" type="button">Сохранить PDF</button>
+        <button id="new-estimate" class="secondary-button" type="button" data-i18n="newEstimate">Новая смета</button>
+        <button id="copy-whatsapp" class="secondary-button" type="button" data-i18n="copyWhatsApp">Скопировать для WhatsApp</button>
+        <button id="save-pdf" class="add-button" type="button" data-i18n="savePdf">Сохранить PDF</button>
       </div>
       <p id="copy-status" class="copy-status" role="status" aria-live="polite"></p>
       <div id="manual-copy" class="manual-copy" hidden>
-        <label class="field" for="manual-copy-text"><span>Текст для копирования вручную</span></label>
+        <label class="field" for="manual-copy-text"><span data-i18n="manualCopy">Текст для копирования вручную</span></label>
         <textarea id="manual-copy-text" readonly></textarea>
       </div>
     </main>

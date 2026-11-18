@@ -22,8 +22,100 @@ const manualCopy = document.querySelector("#manual-copy");
 const manualCopyText = document.querySelector("#manual-copy-text");
 const fromInput = document.querySelector('[name="from"]');
 const toInput = document.querySelector('[name="to"]');
+const themeToggle = document.querySelector("#theme-toggle");
 const storageKey = "smeta-5-minutes-draft-v1";
 let copyStatusTimer;
+let copyStatusKey = "";
+let language = "ru";
+let theme = "light";
+
+const translations = {
+  ru: {
+    appTitle: "Смета за 5 минут", hint: "Добавьте позиции — суммы и итог посчитаются автоматически.",
+    languageLabel: "Язык интерфейса", details: "Реквизиты", from: "От кого", to: "Для кого",
+    estimateNumber: "Номер сметы", date: "Дата", positions: "Позиции", name: "Наименование",
+    quantity: "Количество", unit: "Единица", price: "Цена", sum: "Сумма", remove: "Удалить",
+    addPosition: "+ Добавить позицию", discountPercent: "Скидка, %", vatPercent: "НДС, %",
+    currency: "Валюта", totalLabel: "Итог сметы", discount: "Скидка",
+    discountedSum: "Сумма со скидкой", vat: "НДС", grandTotal: "Итого к оплате",
+    comment: "Комментарий", signature: "Подпись ____________________", newEstimate: "Новая смета",
+    copyWhatsApp: "Скопировать для WhatsApp", savePdf: "Сохранить PDF",
+    manualCopy: "Текст для копирования вручную", fromPlaceholder: "Ваша компания или имя",
+    toPlaceholder: "Клиент или организация", numberPlaceholder: "Например, 001",
+    commentPlaceholder: "Сроки, условия оплаты и другие примечания",
+    namePlaceholder: "Название товара или услуги", removePosition: "Удалить позицию",
+    unitPiece: "шт", unitHour: "час", unitService: "услуга", unnamed: "Без названия",
+    newConfirm: "Создать новую смету? Текущий черновик будет удалён.",
+    copied: "Скопировано ✓", copyManually: "Скопируйте текст вручную",
+    themeLight: "Светлая тема", themeDark: "Тёмная тема",
+  },
+  kk: {
+    appTitle: "5 минутта смета", hint: "Позицияларды қосыңыз — сомалар мен қорытынды автоматты түрде есептеледі.",
+    languageLabel: "Интерфейс тілі", details: "Деректемелер", from: "Кімнен", to: "Кімге",
+    estimateNumber: "Смета нөмірі", date: "Күні", positions: "Позициялар", name: "Атауы",
+    quantity: "Саны", unit: "Өлшем бірлігі", price: "Бағасы", sum: "Сомасы", remove: "Өшіру",
+    addPosition: "+ Позиция қосу", discountPercent: "Жеңілдік, %", vatPercent: "ҚҚС, %",
+    currency: "Валюта", totalLabel: "Смета қорытындысы", discount: "Жеңілдік",
+    discountedSum: "Жеңілдіктен кейінгі сома", vat: "ҚҚС", grandTotal: "Төленетін жалпы сома",
+    comment: "Түсініктеме", signature: "Қолы ____________________", newEstimate: "Жаңа смета",
+    copyWhatsApp: "WhatsApp үшін көшіру", savePdf: "PDF сақтау",
+    manualCopy: "Қолмен көшіруге арналған мәтін", fromPlaceholder: "Компанияңыз немесе атыңыз",
+    toPlaceholder: "Клиент немесе ұйым", numberPlaceholder: "Мысалы, 001",
+    commentPlaceholder: "Мерзімдер, төлем шарттары және басқа ескертпелер",
+    namePlaceholder: "Тауар немесе қызмет атауы", removePosition: "Позицияны өшіру",
+    unitPiece: "дана", unitHour: "сағ", unitService: "қызмет", unnamed: "Атауы жоқ",
+    newConfirm: "Жаңа смета жасайсыз ба? Ағымдағы жоба өшіріледі.",
+    copied: "Көшірілді ✓", copyManually: "Мәтінді қолмен көшіріңіз",
+    themeLight: "Жарық тақырып", themeDark: "Қараңғы тақырып",
+  },
+};
+
+function t(key) {
+  return translations[language][key];
+}
+
+function updateTheme() {
+  document.documentElement.dataset.theme = theme;
+  themeToggle.textContent = t(theme === "dark" ? "themeLight" : "themeDark");
+  themeToggle.setAttribute("aria-pressed", String(theme === "dark"));
+}
+
+function unitLabel(value) {
+  return { шт: t("unitPiece"), час: t("unitHour"), услуга: t("unitService") }[value] || t("unitPiece");
+}
+
+function translateRow(row) {
+  ["name", "quantity", "unit", "price", "sum", "remove"].forEach((key, index) => {
+    row.cells[index].dataset.label = t(key);
+  });
+  row.querySelector(".name-input").placeholder = t("namePlaceholder");
+  row.querySelector('.unit-select option[value="шт"]').textContent = t("unitPiece");
+  row.querySelector('.unit-select option[value="час"]').textContent = t("unitHour");
+  row.querySelector('.unit-select option[value="услуга"]').textContent = t("unitService");
+  row.querySelector(".remove-button").title = t("removePosition");
+}
+
+function updateLanguage() {
+  document.documentElement.lang = language;
+  document.title = t("appTitle");
+  document.querySelectorAll("[data-i18n]").forEach((element) => {
+    element.textContent = t(element.dataset.i18n);
+  });
+  document.querySelectorAll("[data-i18n-placeholder]").forEach((element) => {
+    element.placeholder = t(element.dataset.i18nPlaceholder);
+  });
+  document.querySelectorAll("[data-i18n-aria]").forEach((element) => {
+    element.setAttribute("aria-label", t(element.dataset.i18nAria));
+  });
+  document.querySelectorAll("[data-language]").forEach((button) => {
+    button.setAttribute("aria-pressed", String(button.dataset.language === language));
+  });
+  [...positions.rows].forEach(translateRow);
+  updateLabels();
+  if (copyStatusKey) copyStatus.textContent = t(copyStatusKey);
+  if (!manualCopy.hidden) manualCopyText.value = whatsappText();
+  updateTheme();
+}
 
 function todayValue() {
   const today = new Date();
@@ -51,11 +143,11 @@ function readNumber(value) {
 function updateLabels() {
   [...positions.rows].forEach((row, index) => {
     const number = index + 1;
-    row.querySelector(".name-input").setAttribute("aria-label", `Наименование, позиция ${number}`);
-    row.querySelector(".quantity-input").setAttribute("aria-label", `Количество, позиция ${number}`);
-    row.querySelector(".unit-select").setAttribute("aria-label", `Единица, позиция ${number}`);
-    row.querySelector(".price-input").setAttribute("aria-label", `Цена, позиция ${number}`);
-    row.querySelector(".remove-button").setAttribute("aria-label", `Удалить позицию ${number}`);
+    row.querySelector(".name-input").setAttribute("aria-label", `${t("name")}, № ${number}`);
+    row.querySelector(".quantity-input").setAttribute("aria-label", `${t("quantity")}, № ${number}`);
+    row.querySelector(".unit-select").setAttribute("aria-label", `${t("unit")}, № ${number}`);
+    row.querySelector(".price-input").setAttribute("aria-label", `${t("price")}, № ${number}`);
+    row.querySelector(".remove-button").setAttribute("aria-label", `${t("removePosition")} № ${number}`);
   });
 }
 
@@ -99,6 +191,7 @@ function addPosition(focusName = true) {
     <td data-label="Удалить"><button class="remove-button" type="button" title="Удалить позицию">✕</button></td>
   `;
   positions.append(row);
+  translateRow(row);
   updateLabels();
   recalculate();
   if (focusName) row.querySelector(".name-input").focus();
@@ -107,8 +200,9 @@ function addPosition(focusName = true) {
 function syncPrintDocument() {
   const number = numberInput.value.trim();
   const date = formatDate(dateInput.value);
-  document.querySelector("#print-number").textContent = number || "—";
-  document.querySelector("#print-date").textContent = date || "—";
+  document.querySelector("#print-heading").textContent = language === "ru"
+    ? `Смета № ${number || "—"} от ${date || "—"}`
+    : `№ ${number || "—"} смета · ${date || "—"}`;
   document.querySelector("#print-from").textContent = fromInput.value.trim();
   document.querySelector("#print-to").textContent = toInput.value.trim();
   document.querySelector("#print-detail-number").textContent = number;
@@ -118,7 +212,7 @@ function syncPrintDocument() {
   [...positions.rows].forEach((row) => {
     row.querySelector(".print-name").textContent = row.querySelector(".name-input").value.trim();
     row.querySelector(".print-quantity").textContent = String(readNumber(row.querySelector(".quantity-input").value));
-    row.querySelector(".print-unit").textContent = row.querySelector(".unit-select").value;
+    row.querySelector(".print-unit").textContent = unitLabel(row.querySelector(".unit-select").value);
     row.querySelector(".print-price").textContent = formatMoney(readNumber(row.querySelector(".price-input").value));
   });
 }
@@ -138,6 +232,8 @@ function saveDraft() {
     vat: vatInput.value,
     currency: currencySelect.value,
     comment: commentInput.value,
+    language,
+    theme,
     positions: [...positions.rows].map((row) => ({
       name: row.querySelector(".name-input").value,
       quantity: row.querySelector(".quantity-input").value,
@@ -163,6 +259,8 @@ function restoreDraft() {
     addPosition(false);
     return;
   }
+  if (draft.language === "ru" || draft.language === "kk") language = draft.language;
+  if (draft.theme === "light" || draft.theme === "dark") theme = draft.theme;
   if (typeof draft.from === "string") fromInput.value = draft.from;
   if (typeof draft.to === "string") toInput.value = draft.to;
   if (typeof draft.number === "string") numberInput.value = draft.number;
@@ -195,7 +293,7 @@ function nextEstimateNumber(current) {
 }
 
 function newEstimate() {
-  if (!window.confirm("Создать новую смету? Текущий черновик будет удалён.")) return;
+  if (!window.confirm(t("newConfirm"))) return;
   const nextNumber = nextEstimateNumber(numberInput.value);
   fromInput.value = "";
   toInput.value = "";
@@ -209,6 +307,7 @@ function newEstimate() {
   addPosition(false);
   manualCopy.hidden = true;
   copyStatus.textContent = "";
+  copyStatusKey = "";
   clearTimeout(copyStatusTimer);
   saveDraft();
   fromInput.focus();
@@ -221,17 +320,19 @@ function formatQuantity(value) {
 
 function whatsappText() {
   recalculate();
-  const lines = [`Смета № ${numberInput.value.trim() || "—"} от ${formatDate(dateInput.value) || "—"}`];
+  const number = numberInput.value.trim() || "—";
+  const date = formatDate(dateInput.value) || "—";
+  const lines = [language === "ru" ? `Смета № ${number} от ${date}` : `№ ${number} смета · ${date}`];
   [...positions.rows].forEach((row) => {
     const name = row.querySelector(".name-input").value.trim();
     const quantity = row.querySelector(".quantity-input").value;
     const price = row.querySelector(".price-input").value;
     if (!name && readNumber(quantity) === 0 && readNumber(price) === 0) return;
-    lines.push(`• ${name || "Без названия"} — ${formatQuantity(quantity)} ${row.querySelector(".unit-select").value} × ${formatMoney(readNumber(price))} = ${row.querySelector(".row-total").textContent}`);
+    lines.push(`• ${name || t("unnamed")} — ${formatQuantity(quantity)} ${unitLabel(row.querySelector(".unit-select").value)} × ${formatMoney(readNumber(price))} = ${row.querySelector(".row-total").textContent}`);
   });
-  if (!discountRow.hidden) lines.push(`Скидка ${Math.min(readNumber(discountInput.value), 100)} %: ${discountOutput.textContent}`);
-  if (!vatRow.hidden) lines.push(`НДС ${formatQuantity(vatInput.value)} %: ${vatOutput.textContent}`);
-  lines.push(`Итого к оплате: ${grandTotal.textContent}`);
+  if (!discountRow.hidden) lines.push(`${t("discount")} ${Math.min(readNumber(discountInput.value), 100)} %: ${discountOutput.textContent}`);
+  if (!vatRow.hidden) lines.push(`${t("vat")} ${formatQuantity(vatInput.value)} %: ${vatOutput.textContent}`);
+  lines.push(`${t("grandTotal")}: ${grandTotal.textContent}`);
   return lines.join("\n");
 }
 
@@ -241,13 +342,15 @@ async function copyForWhatsApp() {
     if (!navigator.clipboard?.writeText) throw new Error("Clipboard unavailable");
     await navigator.clipboard.writeText(text);
     manualCopy.hidden = true;
-    copyStatus.textContent = "Скопировано ✓";
+    copyStatusKey = "copied";
+    copyStatus.textContent = t(copyStatusKey);
     clearTimeout(copyStatusTimer);
-    copyStatusTimer = setTimeout(() => { copyStatus.textContent = ""; }, 2000);
+    copyStatusTimer = setTimeout(() => { copyStatus.textContent = ""; copyStatusKey = ""; }, 2000);
   } catch {
     manualCopyText.value = text;
     manualCopy.hidden = false;
-    copyStatus.textContent = "Скопируйте текст вручную";
+    copyStatusKey = "copyManually";
+    copyStatus.textContent = t(copyStatusKey);
     clearTimeout(copyStatusTimer);
     manualCopyText.focus();
     manualCopyText.select();
@@ -265,6 +368,18 @@ document.querySelector(".page").addEventListener("input", saveDraft);
 document.querySelector(".page").addEventListener("change", saveDraft);
 newEstimateButton.addEventListener("click", newEstimate);
 copyWhatsAppButton.addEventListener("click", copyForWhatsApp);
+document.querySelectorAll("[data-language]").forEach((button) => {
+  button.addEventListener("click", () => {
+    language = button.dataset.language;
+    updateLanguage();
+    saveDraft();
+  });
+});
+themeToggle.addEventListener("click", () => {
+  theme = theme === "dark" ? "light" : "dark";
+  updateTheme();
+  saveDraft();
+});
 savePdfButton.addEventListener("click", () => {
   recalculate();
   syncPrintDocument();
@@ -306,3 +421,4 @@ positions.addEventListener("click", (event) => {
 });
 
 restoreDraft();
+updateLanguage();
