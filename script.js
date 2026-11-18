@@ -1,5 +1,6 @@
 const positions = document.querySelector("#positions");
 const grandTotal = document.querySelector("#grand-total");
+const amountInWords = document.querySelector("#amount-in-words");
 const addPositionButton = document.querySelector("#add-position");
 const dateInput = document.querySelector("#estimate-date");
 const discountInput = document.querySelector("#discount-percent");
@@ -140,6 +141,42 @@ function readNumber(value) {
   return Number.isFinite(number) ? number : 0;
 }
 
+function tengeInWords(value) {
+  if (!Number.isInteger(value) || value <= 0 || value > 999999999) return "";
+
+  const units = ["", "один", "два", "три", "четыре", "пять", "шесть", "семь", "восемь", "девять"];
+  const teens = ["десять", "одиннадцать", "двенадцать", "тринадцать", "четырнадцать", "пятнадцать", "шестнадцать", "семнадцать", "восемнадцать", "девятнадцать"];
+  const tens = ["", "", "двадцать", "тридцать", "сорок", "пятьдесят", "шестьдесят", "семьдесят", "восемьдесят", "девяносто"];
+  const hundreds = ["", "сто", "двести", "триста", "четыреста", "пятьсот", "шестьсот", "семьсот", "восемьсот", "девятьсот"];
+  const words = [];
+  const groups = [
+    { divisor: 1000000, forms: ["миллион", "миллиона", "миллионов"] },
+    { divisor: 1000, forms: ["тысяча", "тысячи", "тысяч"] },
+    { divisor: 1 },
+  ];
+
+  groups.forEach(({ divisor, forms }) => {
+    const group = Math.floor(value / divisor) % 1000;
+    if (group === 0) return;
+    const lastTwo = group % 100;
+    const last = group % 10;
+    if (group >= 100) words.push(hundreds[Math.floor(group / 100)]);
+    if (lastTwo >= 10 && lastTwo <= 19) {
+      words.push(teens[lastTwo - 10]);
+    } else {
+      if (lastTwo >= 20) words.push(tens[Math.floor(lastTwo / 10)]);
+      if (last) words.push(divisor === 1000 && last <= 2 ? ["", "одна", "две"][last] : units[last]);
+    }
+    if (forms) {
+      const form = lastTwo >= 11 && lastTwo <= 14 ? 2 : last === 1 ? 0 : last >= 2 && last <= 4 ? 1 : 2;
+      words.push(forms[form]);
+    }
+  });
+
+  const text = `${words.join(" ")} тенге`;
+  return text[0].toUpperCase() + text.slice(1);
+}
+
 function updateLabels() {
   [...positions.rows].forEach((row, index) => {
     const number = index + 1;
@@ -175,6 +212,9 @@ function recalculate() {
   discountedOutput.textContent = formatMoney(discountedTotal);
   vatOutput.textContent = formatMoney(vat);
   grandTotal.textContent = formatMoney(discountedTotal + vat);
+  const words = currencySelect.value === "₸" ? tengeInWords(discountedTotal + vat) : "";
+  amountInWords.textContent = words ? `Сумма прописью: ${words}` : "";
+  amountInWords.hidden = !words;
   discountRow.hidden = discount === 0;
   discountedRow.hidden = discountedTotal === 0;
   vatRow.hidden = vat === 0;
@@ -333,6 +373,7 @@ function whatsappText() {
   if (!discountRow.hidden) lines.push(`${t("discount")} ${Math.min(readNumber(discountInput.value), 100)} %: ${discountOutput.textContent}`);
   if (!vatRow.hidden) lines.push(`${t("vat")} ${formatQuantity(vatInput.value)} %: ${vatOutput.textContent}`);
   lines.push(`${t("grandTotal")}: ${grandTotal.textContent}`);
+  if (!amountInWords.hidden) lines.push(amountInWords.textContent);
   return lines.join("\n");
 }
 

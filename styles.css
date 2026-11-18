@@ -131,6 +131,8 @@ th:last-child { width: 8%; }
 .total-row output { white-space: nowrap; font-weight: 700; }
 .grand-total-row { padding-top: 16px; border-top: 1px solid #b7ccdc; font-size: 20px; font-weight: 700; }
 .grand-total-row output { color: var(--accent); font-size: clamp(25px, 4vw, 34px); }
+.amount-in-words { margin: 0; line-height: 1.5; overflow-wrap: anywhere; }
+.amount-in-words[hidden] { display: none; }
 .comment-card { margin-top: 20px; }
 .comment-card .field { gap: 10px; }
 .actions { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 12px; }
