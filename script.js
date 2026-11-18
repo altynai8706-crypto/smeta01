@@ -35,7 +35,6 @@ const translations = {
     languageLabel: "Язык интерфейса", details: "Реквизиты", from: "От кого", to: "Для кого",
     estimateNumber: "Номер сметы", date: "Дата", positions: "Позиции", name: "Наименование",
     quantity: "Количество", unit: "Единица", price: "Цена", sum: "Сумма", remove: "Удалить",
-    rowActions: "Действия", duplicate: "Дублировать", duplicatePosition: "Дублировать позицию",
     addPosition: "+ Добавить позицию", discountPercent: "Скидка, %", vatPercent: "НДС, %",
     currency: "Валюта", totalLabel: "Итог сметы", discount: "Скидка",
     discountedSum: "Сумма со скидкой", vat: "НДС", grandTotal: "Итого к оплате",
@@ -55,7 +54,6 @@ const translations = {
     languageLabel: "Интерфейс тілі", details: "Деректемелер", from: "Кімнен", to: "Кімге",
     estimateNumber: "Смета нөмірі", date: "Күні", positions: "Позициялар", name: "Атауы",
     quantity: "Саны", unit: "Өлшем бірлігі", price: "Бағасы", sum: "Сомасы", remove: "Өшіру",
-    rowActions: "Әрекеттер", duplicate: "Көшірмелеу", duplicatePosition: "Позицияны көшірмелеу",
     addPosition: "+ Позиция қосу", discountPercent: "Жеңілдік, %", vatPercent: "ҚҚС, %",
     currency: "Валюта", totalLabel: "Смета қорытындысы", discount: "Жеңілдік",
     discountedSum: "Жеңілдіктен кейінгі сома", vat: "ҚҚС", grandTotal: "Төленетін жалпы сома",
@@ -87,7 +85,7 @@ function unitLabel(value) {
 }
 
 function translateRow(row) {
-  ["name", "quantity", "unit", "price", "sum", "rowActions"].forEach((key, index) => {
+  ["name", "quantity", "unit", "price", "sum", "remove"].forEach((key, index) => {
     row.cells[index].dataset.label = t(key);
   });
   row.querySelector(".name-input").placeholder = t("namePlaceholder");
@@ -95,7 +93,6 @@ function translateRow(row) {
   row.querySelector('.unit-select option[value="час"]').textContent = t("unitHour");
   row.querySelector('.unit-select option[value="услуга"]').textContent = t("unitService");
   row.querySelector(".remove-button").title = t("removePosition");
-  row.querySelector(".duplicate-button").textContent = t("duplicate");
 }
 
 function updateLanguage() {
@@ -151,7 +148,6 @@ function updateLabels() {
     row.querySelector(".unit-select").setAttribute("aria-label", `${t("unit")}, № ${number}`);
     row.querySelector(".price-input").setAttribute("aria-label", `${t("price")}, № ${number}`);
     row.querySelector(".remove-button").setAttribute("aria-label", `${t("removePosition")} № ${number}`);
-    row.querySelector(".duplicate-button").setAttribute("aria-label", `${t("duplicatePosition")} № ${number}`);
   });
 }
 
@@ -184,7 +180,7 @@ function recalculate() {
   vatRow.hidden = vat === 0;
 }
 
-function addPosition(focusName = true, afterRow = null) {
+function addPosition(focusName = true) {
   const row = document.createElement("tr");
   row.innerHTML = `
     <td data-label="Наименование"><input class="name-input" type="text" placeholder="Название товара или услуги"><span class="print-value print-name"></span></td>
@@ -192,15 +188,13 @@ function addPosition(focusName = true, afterRow = null) {
     <td data-label="Единица"><select class="unit-select"><option value="шт">шт</option><option value="час">час</option><option value="услуга">услуга</option></select><span class="print-value print-unit"></span></td>
     <td data-label="Цена"><input class="price-input" type="text" inputmode="decimal" placeholder="0"><span class="print-value print-price"></span></td>
     <td data-label="Сумма"><output class="row-total">0 ₸</output></td>
-    <td data-label="Действия"><div class="row-actions"><button class="secondary-button duplicate-button" type="button">Дублировать</button><button class="remove-button" type="button" title="Удалить позицию">✕</button></div></td>
+    <td data-label="Удалить"><button class="remove-button" type="button" title="Удалить позицию">✕</button></td>
   `;
-  if (afterRow) afterRow.after(row);
-  else positions.append(row);
+  positions.append(row);
   translateRow(row);
   updateLabels();
   recalculate();
   if (focusName) row.querySelector(".name-input").focus();
-  return row;
 }
 
 function syncPrintDocument() {
@@ -411,18 +405,6 @@ positions.addEventListener("keydown", (event) => {
 });
 
 positions.addEventListener("click", (event) => {
-  const duplicateButton = event.target.closest(".duplicate-button");
-  if (duplicateButton) {
-    const source = duplicateButton.closest("tr");
-    const copy = addPosition(false, source);
-    ["name-input", "quantity-input", "unit-select", "price-input"].forEach((className) => {
-      copy.querySelector(`.${className}`).value = source.querySelector(`.${className}`).value;
-    });
-    recalculate();
-    saveDraft();
-    copy.querySelector(".name-input").focus();
-    return;
-  }
   const button = event.target.closest(".remove-button");
   if (!button) return;
   const row = button.closest("tr");
