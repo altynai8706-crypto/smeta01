@@ -86,16 +86,18 @@ button { min-height: 44px; min-width: 44px; cursor: pointer; }
 }
 .add-button:hover { background: var(--accent); }
 .table-scroll { overflow-x: auto; }
-table { width: 100%; min-width: 750px; border-collapse: collapse; table-layout: fixed; }
+table { width: 100%; min-width: 900px; border-collapse: collapse; table-layout: fixed; }
 th { padding: 12px 8px; text-align: left; color: var(--accent); background: #eaf3f9; font-size: 14px; font-weight: 700; }
 td { padding: 12px 8px; border-top: 1px solid #e7edf4; vertical-align: middle; }
-th:first-child { width: 29%; }
-th:nth-child(2) { width: 15%; }
-th:nth-child(3) { width: 14%; }
-th:nth-child(4) { width: 17%; }
-th:nth-child(5) { width: 17%; }
-th:last-child { width: 8%; }
+th:first-child { width: 25%; }
+th:nth-child(2) { width: 13%; }
+th:nth-child(3) { width: 12%; }
+th:nth-child(4) { width: 15%; }
+th:nth-child(5) { width: 13%; }
+th:last-child { width: 22%; }
 .row-total { display: block; font-weight: 700; white-space: nowrap; }
+.row-actions { display: flex; align-items: center; gap: 6px; }
+.duplicate-button { min-height: 44px; padding: 8px 10px; font-size: 14px; white-space: nowrap; }
 .remove-button {
   display: grid;
   place-items: center;
@@ -184,6 +186,8 @@ th:last-child { width: 8%; }
   [data-theme="dark"] .adjustments { border-color: #3b566c; }
   [data-theme="dark"] .remove-button { background: #24384c; border-color: #6e879a; color: #ffb9b9; }
   [data-theme="dark"] .remove-button:hover { background: #49313c; }
+  [data-theme="dark"] .duplicate-button { background: #1a2b3d; color: var(--accent); border-color: #6e9fc1; }
+  [data-theme="dark"] .duplicate-button:hover { background: #28445d; }
   [data-theme="dark"] .add-button:hover { background: #17517e; }
   [data-theme="dark"] .grand-total-row { border-top-color: #5a758b; }
   [data-theme="dark"] .copy-status { color: #9be4b4; }
@@ -208,6 +212,7 @@ th:last-child { width: 8%; }
   td::before { content: attr(data-label); color: #526174; font-size: 14px; font-weight: 600; }
   td:last-child { justify-items: end; }
   td:last-child::before { display: none; }
+  .row-actions { flex-wrap: wrap; justify-content: flex-end; }
   .adjustments { grid-template-columns: 1fr; gap: 16px; }
   .total-card { padding: 20px; }
   .total-row { align-items: flex-start; }
